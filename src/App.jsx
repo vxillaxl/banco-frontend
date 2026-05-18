@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TransferenciaForm from './components/TransferenciaForm';
 import DepositoForm from './components/DepositoForm';
 import HistorialTransacciones from './components/HistorialTransacciones';
 import SaldoCuenta from './components/SaldoCuenta';
+import { consultarSaldo } from './services/api';
 import './App.css';
 
 const TABS = [
@@ -15,6 +16,26 @@ function App() {
   const [activeTab, setActiveTab] = useState('transferencia');
   const [userIdActivo, setUserIdActivo] = useState('user-juan');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [cuentaActiva] = useState('cuenta-001');
+  const [saldo, setSaldo] = useState(0);
+  const [saldoLoading, setSaldoLoading] = useState(true);
+  const [saldoError, setSaldoError] = useState('');
+
+  const fetchSaldo = useCallback(async () => {
+    setSaldoLoading(true);
+    setSaldoError('');
+    const result = await consultarSaldo(cuentaActiva);
+    if (result.success) {
+      setSaldo(result.saldo);
+    } else {
+      setSaldoError(result.message);
+    }
+    setSaldoLoading(false);
+  }, [cuentaActiva]);
+
+  useEffect(() => {
+    fetchSaldo();
+  }, [fetchSaldo, refreshTrigger]);
 
   const handleSuccess = (userId) => {
     setUserIdActivo(userId);
@@ -43,7 +64,7 @@ function App() {
           <p className="subtitle">Transferencias seguras con saga distribuida</p>
         </header>
 
-        <SaldoCuenta cuenta="cuenta-001" saldo={1000.0} />
+        <SaldoCuenta cuenta={cuentaActiva} saldo={saldo} loading={saldoLoading} error={saldoError} />
 
         <section className="panel">
           <nav className="tabs" aria-label="Secciones">

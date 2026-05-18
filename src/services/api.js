@@ -118,4 +118,23 @@ export const consultarHistorial = async (userId) => {
   }
 };
 
+// Consultar saldo
+export const consultarSaldo = async (accountId) => {
+  try {
+    const response = await api.get(`/saldo?accountId=${encodeURIComponent(accountId)}`);
+    if (response.status === 200) {
+      const data = parsePayload(response.data);
+      return {
+        success: true,
+        saldo: parseFloat(data.saldo ?? data.balance ?? 0),
+        cuenta: data.accountId ?? accountId,
+      };
+    }
+    return { success: false, message: 'Respuesta inesperada del servidor', saldo: 0, cuenta: accountId };
+  } catch (error) {
+    console.error('Error en consultarSaldo:', error.message);
+    return { success: false, message: error.message || 'Error al consultar saldo', saldo: 0, cuenta: accountId };
+  }
+};
+
 export default api;
