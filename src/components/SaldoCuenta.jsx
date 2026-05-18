@@ -1,37 +1,17 @@
-import React from 'react';
-import LoadingSpinner from './LoadingSpinner';
+import React, { useEffect, useState } from 'react';
 import '../styles/saldo.css';
 
-const SaldoCuenta = ({ cuenta, saldo, loading, error }) => {
-  if (loading) {
-    return (
-      <article className="saldo-card">
-        <div className="saldo-card-glow" aria-hidden="true" />
-        <div className="saldo-card-inner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
-          <LoadingSpinner />
-        </div>
-      </article>
-    );
-  }
+const SaldoCuenta = ({ cuenta, saldo }) => {
+  const [pulse, setPulse] = useState(false);
 
-  if (error) {
-    return (
-      <article className="saldo-card">
-        <div className="saldo-card-glow" aria-hidden="true" />
-        <div className="saldo-card-inner">
-          <div className="saldo-top">
-            <span className="saldo-label">Saldo disponible</span>
-            <span className="saldo-chip" style={{ background: '#e74c3c', color: 'white' }}>Error</span>
-          </div>
-          <p style={{ color: '#e74c3c', fontSize: '0.85em' }}>{error}</p>
-          <p className="saldo-cuenta">{cuenta}</p>
-        </div>
-      </article>
-    );
-  }
+  useEffect(() => {
+    setPulse(true);
+    const timer = setTimeout(() => setPulse(false), 600);
+    return () => clearTimeout(timer);
+  }, [saldo]);
 
   return (
-    <article className="saldo-card">
+    <article className={`saldo-card ${pulse ? 'saldo-card--pulse' : ''}`}>
       <div className="saldo-card-glow" aria-hidden="true" />
       <div className="saldo-card-inner">
         <div className="saldo-top">

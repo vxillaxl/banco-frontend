@@ -47,7 +47,11 @@ const DepositoForm = ({ onSuccess }) => {
         });
 
         if (onSuccess) {
-          setTimeout(() => onSuccess(formData.userId), 1000);
+          onSuccess({
+            userId: formData.userId,
+            accountId: formData.accountId,
+            amount: parseFloat(formData.amount),
+          });
         }
       } else {
         setMessageType('error');

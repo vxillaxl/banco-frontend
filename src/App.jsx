@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import TransferenciaForm from './components/TransferenciaForm';
 import DepositoForm from './components/DepositoForm';
 import HistorialTransacciones from './components/HistorialTransacciones';
 import SaldoCuenta from './components/SaldoCuenta';
-import { consultarSaldo } from './services/api';
 import './App.css';
 
 const TABS = [
@@ -12,35 +11,37 @@ const TABS = [
   { id: 'historial', label: 'Historial', icon: '◎' },
 ];
 
+const CUENTA_PRINCIPAL = 'cuenta-001';
+const SALDO_INICIAL = 50000;
+
+function roundMoney(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('transferencia');
   const [userIdActivo, setUserIdActivo] = useState('user-juan');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [cuentaActiva] = useState('cuenta-001');
-  const [saldo, setSaldo] = useState(0);
-  const [saldoLoading, setSaldoLoading] = useState(true);
-  const [saldoError, setSaldoError] = useState('');
+  const [saldo, setSaldo] = useState(SALDO_INICIAL);
 
-  const fetchSaldo = useCallback(async () => {
-    setSaldoLoading(true);
-    setSaldoError('');
-    const result = await consultarSaldo(cuentaActiva);
-    if (result.success) {
-      setSaldo(result.saldo);
-    } else {
-      setSaldoError(result.message);
-    }
-    setSaldoLoading(false);
-  }, [cuentaActiva]);
-
-  useEffect(() => {
-    fetchSaldo();
-  }, [fetchSaldo, refreshTrigger]);
-
-  const handleSuccess = (userId) => {
+  const refreshHistorial = useCallback((userId) => {
     setUserIdActivo(userId);
-    setRefreshTrigger((prev) => prev + 1);
-  };
+    setTimeout(() => setRefreshTrigger((prev) => prev + 1), 1000);
+  }, []);
+
+  const handleTransferSuccess = useCallback(({ userId, fromAccount, amount }) => {
+    if (fromAccount === CUENTA_PRINCIPAL) {
+      setSaldo((prev) => Math.max(0, roundMoney(prev - amount)));
+    }
+    refreshHistorial(userId);
+  }, [refreshHistorial]);
+
+  const handleDepositSuccess = useCallback(({ userId, accountId, amount }) => {
+    if (accountId === CUENTA_PRINCIPAL) {
+      setSaldo((prev) => roundMoney(prev + amount));
+    }
+    refreshHistorial(userId);
+  }, [refreshHistorial]);
 
   return (
     <div className="app">
@@ -64,7 +65,7 @@ function App() {
           <p className="subtitle">Transferencias seguras con saga distribuida</p>
         </header>
 
-        <SaldoCuenta cuenta={cuentaActiva} saldo={saldo} loading={saldoLoading} error={saldoError} />
+        <SaldoCuenta cuenta={CUENTA_PRINCIPAL} saldo={saldo} />
 
         <section className="panel">
           <nav className="tabs" aria-label="Secciones">
@@ -82,8 +83,16 @@ function App() {
           </nav>
 
           <div className="content">
-            {activeTab === 'transferencia' && <TransferenciaForm onSuccess={handleSuccess} />}
-            {activeTab === 'deposito' && <DepositoForm onSuccess={handleSuccess} />}
+            {activeTab === 'transferencia' && (
+              <TransferenciaForm
+                onSuccess={handleTransferSuccess}
+                saldoDisponible={saldo}
+                cuentaOrigen={CUENTA_PRINCIPAL}
+              />
+            )}
+            {activeTab === 'deposito' && (
+              <DepositoForm onSuccess={handleDepositSuccess} />
+            )}
             {activeTab === 'historial' && (
               <HistorialTransacciones key={refreshTrigger} userId={userIdActivo} />
             )}
