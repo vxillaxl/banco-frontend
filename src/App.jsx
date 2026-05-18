@@ -11,14 +11,36 @@ const TABS = [
   { id: 'historial', label: 'Historial', icon: '◎' },
 ];
 
+const CUENTA_PRINCIPAL = 'cuenta-001';
+const SALDO_INICIAL = 1000;
+
+function roundMoney(value) {
+  return Math.round(value * 100) / 100;
+}
+
 function App() {
   const [activeTab, setActiveTab] = useState('transferencia');
   const [userIdActivo, setUserIdActivo] = useState('user-juan');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [saldo, setSaldo] = useState(SALDO_INICIAL);
 
-  const handleSuccess = (userId) => {
+  const refreshHistorial = (userId) => {
     setUserIdActivo(userId);
-    setRefreshTrigger((prev) => prev + 1);
+    setTimeout(() => setRefreshTrigger((prev) => prev + 1), 1000);
+  };
+
+  const handleTransferSuccess = ({ userId, fromAccount, amount }) => {
+    if (fromAccount === CUENTA_PRINCIPAL) {
+      setSaldo((prev) => Math.max(0, roundMoney(prev - amount)));
+    }
+    refreshHistorial(userId);
+  };
+
+  const handleDepositSuccess = ({ userId, accountId, amount }) => {
+    if (accountId === CUENTA_PRINCIPAL) {
+      setSaldo((prev) => roundMoney(prev + amount));
+    }
+    refreshHistorial(userId);
   };
 
   return (
@@ -43,7 +65,7 @@ function App() {
           <p className="subtitle">Transferencias seguras con saga distribuida</p>
         </header>
 
-        <SaldoCuenta cuenta="cuenta-001" saldo={1000.0} />
+        <SaldoCuenta cuenta={CUENTA_PRINCIPAL} saldo={saldo} />
 
         <section className="panel">
           <nav className="tabs" aria-label="Secciones">
@@ -61,8 +83,16 @@ function App() {
           </nav>
 
           <div className="content">
-            {activeTab === 'transferencia' && <TransferenciaForm onSuccess={handleSuccess} />}
-            {activeTab === 'deposito' && <DepositoForm onSuccess={handleSuccess} />}
+            {activeTab === 'transferencia' && (
+              <TransferenciaForm
+                onSuccess={handleTransferSuccess}
+                saldoDisponible={saldo}
+                cuentaOrigen={CUENTA_PRINCIPAL}
+              />
+            )}
+            {activeTab === 'deposito' && (
+              <DepositoForm onSuccess={handleDepositSuccess} />
+            )}
             {activeTab === 'historial' && (
               <HistorialTransacciones key={refreshTrigger} userId={userIdActivo} />
             )}

@@ -55,6 +55,12 @@
   color: #ffffff;
   line-height: 1.1;
   margin-bottom: 8px;
+  transition: transform 0.35s ease, color 0.35s ease;
+}
+
+.saldo-card--pulse .saldo-monto {
+  transform: scale(1.04);
+  color: #a5f3fc;
 }
 
 .saldo-currency {

@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/saldo.css';
 
 const SaldoCuenta = ({ cuenta, saldo }) => {
+  const [pulse, setPulse] = useState(false);
+
+  useEffect(() => {
+    setPulse(true);
+    const timer = setTimeout(() => setPulse(false), 600);
+    return () => clearTimeout(timer);
+  }, [saldo]);
+
   return (
-    <article className="saldo-card">
+    <article className={`saldo-card ${pulse ? 'saldo-card--pulse' : ''}`}>
       <div className="saldo-card-glow" aria-hidden="true" />
       <div className="saldo-card-inner">
         <div className="saldo-top">
