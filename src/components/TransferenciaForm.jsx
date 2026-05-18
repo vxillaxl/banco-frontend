@@ -3,7 +3,7 @@ import { realizarTransferencia } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
 import '../styles/forms.css';
 
-const TransferenciaForm = ({ onSuccess, saldoDisponible, cuentaOrigen = 'cuenta-001' }) => {
+const TransferenciaForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     fromAccount: 'cuenta-001',
     toAccount: '',
@@ -38,13 +38,6 @@ const TransferenciaForm = ({ onSuccess, saldoDisponible, cuentaOrigen = 'cuenta-
       return;
     }
 
-    const amount = parseFloat(formData.amount);
-    if (formData.fromAccount === cuentaOrigen && amount > saldoDisponible) {
-      setMessageType('error');
-      setMessage('❌ Saldo insuficiente para esta transferencia');
-      return;
-    }
-
     setLoading(true);
     setMessage('');
 
@@ -64,11 +57,7 @@ const TransferenciaForm = ({ onSuccess, saldoDisponible, cuentaOrigen = 'cuenta-
         });
 
         if (onSuccess) {
-          onSuccess({
-            userId: formData.userId,
-            fromAccount: formData.fromAccount,
-            amount,
-          });
+          setTimeout(() => onSuccess(formData.userId), 1000);
         }
       } else {
         setMessageType('error');
