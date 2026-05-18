@@ -1,0 +1,71 @@
+.saldo-card {
+  position: relative;
+  margin-bottom: 22px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.saldo-card-glow {
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, #0ea5e9, #22d3ee, #0369a1);
+  border-radius: 19px;
+  z-index: 0;
+}
+
+.saldo-card-inner {
+  position: relative;
+  z-index: 1;
+  margin: 1px;
+  padding: 22px 24px;
+  border-radius: 17px;
+  background: linear-gradient(145deg, #0c4a6e 0%, #075985 45%, #0e7490 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.saldo-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.saldo-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bae6fd;
+}
+
+.saldo-chip {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(34, 211, 238, 0.2);
+  color: #a5f3fc;
+  border: 1px solid rgba(165, 243, 252, 0.35);
+}
+
+.saldo-monto {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.saldo-currency {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #7dd3fc;
+  margin-right: 2px;
+}
+
+.saldo-cuenta {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+}
